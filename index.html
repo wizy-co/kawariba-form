@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>カワリバ 情報登録</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: #f4f6f8; color: #1c2733; }
+  header { background: #16324f; color: #fff; padding: 18px 20px; }
+  header .logo { font-size: 20px; font-weight: 700; letter-spacing: .12em; }
+  header .sub { font-size: 12px; opacity: .85; margin-top: 4px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 16px; }
+  .steps { display: flex; gap: 6px; margin: 4px 0 14px; }
+  .steps div { flex: 1; text-align: center; font-size: 11px; padding: 7px 2px; border-radius: 999px; background: #dde4ea; color: #5a6a78; }
+  .steps div.on { background: #16324f; color: #fff; font-weight: 700; }
+  .card { background: #fff; border: 1px solid #e1e7ec; border-radius: 12px; padding: 18px 16px; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
+  .note { font-size: 12px; color: #5a6a78; margin: 0 0 14px; line-height: 1.6; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; }
+  label .req { color: #c0392b; font-size: 11px; margin-left: 6px; }
+  input[type=text], input[type=email], input[type=tel], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 11px 12px; font-size: 16px; border: 1px solid #c4ced6; border-radius: 8px; background: #fff; }
+  textarea { min-height: 84px; resize: vertical; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; margin: 0; padding: 8px 12px; border: 1px solid #c4ced6; border-radius: 999px; background: #fff; }
+  .checks input { accent-color: #16324f; }
+  .row2 { display: flex; gap: 10px; }
+  .row2 > div { flex: 1; }
+  .btns { display: flex; gap: 10px; margin-top: 20px; }
+  button { flex: 1; padding: 14px; font-size: 15px; font-weight: 700; border: none; border-radius: 999px; cursor: pointer; }
+  .btn-main { background: #16324f; color: #fff; }
+  .btn-sub { background: #e8edf1; color: #33424f; }
+  .err { color: #c0392b; font-size: 13px; min-height: 18px; margin-top: 10px; }
+  .done { text-align: center; padding: 26px 6px; }
+  .done .big { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+  .done p { font-size: 13px; color: #45545f; line-height: 1.8; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">カワリバ</div>
+  <div class="sub">転職支援サービス 情報登録フォーム</div>
+</header>
+<div class="wrap">
+  <div class="steps" id="stepbar">
+    <div data-s="1" class="on">1. 基本情報</div>
+    <div data-s="2">2. 現在の状況</div>
+    <div data-s="3">3. 希望条件</div>
+  </div>
+
+  <div class="card" id="form-card">
+    <!-- STEP 1 -->
+    <section id="step1">
+      <h2>基本情報</h2>
+      <p class="note">まずはあなたの基本情報を教えてください。</p>
+      <label>氏名<span class="req">必須</span></label>
+      <input type="text" id="f-name" placeholder="例：山田 太郎" autocomplete="name">
+      <label>生年月日<span class="req">必須</span></label>
+      <input type="date" id="f-birthdate">
+      <label>メールアドレス<span class="req">必須</span></label>
+      <input type="email" id="f-email" placeholder="例：example@mail.jp" autocomplete="email">
+      <label>電話番号<span class="req">必須</span></label>
+      <input type="tel" id="f-phone" placeholder="例：09012345678" autocomplete="tel">
+      <label>最終学歴</label>
+      <select id="f-education">
+        <option value="">選択してください</option>
+        <option>中学校卒業</option>
+        <option>高等学校卒業</option>
+        <option>専門学校卒業</option>
+        <option>短期大学卒業</option>
+        <option>大学卒業</option>
+        <option>大学院卒業</option>
+        <option>その他</option>
+      </select>
+      <div class="err" id="err1"></div>
+      <div class="btns"><button class="btn-main" onclick="goStep(2)">次へ</button></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="step2" class="hidden">
+      <h2>現在の状況</h2>
+      <p class="note">いまのお仕事や、これまでのご経歴について教えてください。</p>
+      <label>現職業</label>
+      <input type="text" id="f-currentJob" placeholder="例：製造業（工場勤務）">
+      <div class="row2">
+        <div>
+          <label>現年収（万円）</label>
+          <input type="number" id="f-currentIncome" placeholder="例：350" inputmode="numeric">
+        </div>
+        <div>
+          <label>転職回数</label>
+          <select id="f-jobChanges">
+            <option value="">選択</option>
+            <option>初めて</option>
+            <option>1回</option>
+            <option>2回</option>
+            <option>3回</option>
+            <option>4回</option>
+            <option>5回以上</option>
+          </select>
+        </div>
+      </div>
+      <label>入社希望日</label>
+      <input type="date" id="f-startDate">
+      <label>職務経歴（過去に勤めた企業名）</label>
+      <textarea id="f-careerHistory" placeholder="例：株式会社○○（2019年〜2022年）、株式会社△△（2022年〜現在）"></textarea>
+      <label>転職理由</label>
+      <textarea id="f-reason" placeholder="転職を考えた理由を教えてください"></textarea>
+      <div class="err" id="err2"></div>
+      <div class="btns">
+        <button class="btn-sub" onclick="goStep(1)">戻る</button>
+        <button class="btn-main" onclick="goStep(3)">次へ</button>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="step3" class="hidden">
+      <h2>希望条件</h2>
+      <p class="note">転職先へのご希望を教えてください。分かる範囲で大丈夫です。</p>
+      <label>希望業種（許容範囲も含めて）</label>
+      <textarea id="f-desiredIndustries" placeholder="例：製造業、物流。接客業も可"></textarea>
+      <label>禁止業種（避けたい業種）</label>
+      <input type="text" id="f-ngIndustries" placeholder="例：飲食、夜勤のある仕事">
+      <label>在住地域</label>
+      <input type="text" id="f-area" placeholder="例：岐阜県岐阜市">
+      <div class="row2">
+        <div>
+          <label>最寄駅</label>
+          <input type="text" id="f-station" placeholder="例：岐阜駅">
+        </div>
+        <div>
+          <label>自宅から最寄駅まで</label>
+          <input type="text" id="f-stationTime" placeholder="例：徒歩10分">
+        </div>
+      </div>
+      <label>希望勤務地域</label>
+      <input type="text" id="f-desiredArea" placeholder="例：岐阜市内、大垣市も可">
+      <label>希望雇用形態</label>
+      <div class="checks" id="f-employmentTypes">
+        <label><input type="checkbox" value="正社員">正社員</label>
+        <label><input type="checkbox" value="契約社員">契約社員</label>
+        <label><input type="checkbox" value="派遣社員">派遣社員</label>
+        <label><input type="checkbox" value="パート・アルバイト">パート・アルバイト</label>
+        <label><input type="checkbox" value="その他">その他</label>
+      </div>
+      <label>希望年収（万円）</label>
+      <input type="number" id="f-desiredIncome" placeholder="例：400" inputmode="numeric">
+      <label>希望休日</label>
+      <div class="checks" id="f-desiredHolidays">
+        <label><input type="checkbox" value="土日祝休み">土日祝休み</label>
+        <label><input type="checkbox" value="週休2日">週休2日</label>
+        <label><input type="checkbox" value="シフト制">シフト制</label>
+        <label><input type="checkbox" value="平日休み">平日休み</label>
+        <label><input type="checkbox" value="その他">その他</label>
+      </div>
+      <label>希望の曜日で休日が取れる場合、シフト制勤務は可能ですか？</label>
+      <div class="checks" id="f-shiftOk">
+        <label><input type="radio" name="shiftOk" value="可能">可能</label>
+        <label><input type="radio" name="shiftOk" value="不可">不可</label>
+        <label><input type="radio" name="shiftOk" value="条件による">条件による</label>
+      </div>
+      <div class="err" id="err3"></div>
+      <div class="btns">
+        <button class="btn-sub" onclick="goStep(2)">戻る</button>
+        <button class="btn-main" id="submitBtn" onclick="submitForm()">登録する</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="card hidden" id="done-card">
+    <div class="done">
+      <div class="big">ご登録ありがとうございました</div>
+      <p>内容を受け付けました。<br>担当アドバイザーより、このトークに面談の日程候補をご案内いたします。<br>今しばらくお待ちください。</p>
+      <div class="btns"><button class="btn-main" onclick="closeLiff()">閉じる</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var LIFF_ID = '2012767057-TcvioMOb';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwIqHQWcTEgwY51J4WJpepjjHxFJuvx8fpy05IFLSFN0wOdRdxVrzglcux3syL3821wTA/exec';
+  var lineUserId = '';
+  var displayName = '';
+
+  window.onload = function() {
+    if (!LIFF_ID) return;
+    liff.init({ liffId: LIFF_ID }).then(function() {
+      if (liff.isLoggedIn()) {
+        return liff.getProfile();
+      }
+      return null;
+    }).then(function(profile) {
+      if (profile) {
+        lineUserId = profile.userId;
+        displayName = profile.displayName;
+      }
+    }).catch(function(err) {
+      console.log('LIFF init error: ' + err);
+    });
+  };
+
+  function goStep(n) {
+    if (n === 2 && !validateStep1()) return;
+    for (var i = 1; i <= 3; i++) {
+      document.getElementById('step' + i).classList.toggle('hidden', i !== n);
+    }
+    var bars = document.querySelectorAll('#stepbar div');
+    bars.forEach(function(b) {
+      b.classList.toggle('on', Number(b.getAttribute('data-s')) === n);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function validateStep1() {
+    var err = document.getElementById('err1');
+    if (!val('f-name')) { err.textContent = '氏名を入力してください。'; return false; }
+    if (!val('f-birthdate')) { err.textContent = '生年月日を入力してください。'; return false; }
+    if (!val('f-email')) { err.textContent = 'メールアドレスを入力してください。'; return false; }
+    if (!val('f-phone')) { err.textContent = '電話番号を入力してください。'; return false; }
+    err.textContent = '';
+    return true;
+  }
+
+  function val(id) { return document.getElementById(id).value.trim(); }
+
+  function checkedVals(id) {
+    var out = [];
+    document.querySelectorAll('#' + id + ' input:checked').forEach(function(c) { out.push(c.value); });
+    return out.join('、');
+  }
+
+  function radioVal(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function submitForm() {
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '送信中…';
+    var data = {
+      name: val('f-name'),
+      birthdate: val('f-birthdate'),
+      email: val('f-email'),
+      phone: val('f-phone'),
+      education: val('f-education'),
+      currentJob: val('f-currentJob'),
+      currentIncome: val('f-currentIncome'),
+      startDate: val('f-startDate'),
+      jobChanges: val('f-jobChanges'),
+      careerHistory: val('f-careerHistory'),
+      reason: val('f-reason'),
+      desiredIndustries: val('f-desiredIndustries'),
+      ngIndustries: val('f-ngIndustries'),
+      area: val('f-area'),
+      station: val('f-station'),
+      stationTime: val('f-stationTime'),
+      desiredArea: val('f-desiredArea'),
+      employmentTypes: checkedVals('f-employmentTypes'),
+      desiredIncome: val('f-desiredIncome'),
+      desiredHolidays: checkedVals('f-desiredHolidays'),
+      shiftOk: radioVal('shiftOk'),
+      lineUserId: lineUserId,
+      displayName: displayName
+    };
+    fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ type: 'register', data: data })
+    }).then(function() {
+      document.getElementById('form-card').classList.add('hidden');
+      document.getElementById('stepbar').classList.add('hidden');
+      document.getElementById('done-card').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }).catch(function(e) {
+      document.getElementById('err3').textContent = '送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。';
+      btn.disabled = false;
+      btn.textContent = '登録する';
+    });
+  }
+
+  function closeLiff() {
+    if (window.liff && liff.isInClient()) { liff.closeWindow(); }
+  }
+</script>
+</body>
+</html>
